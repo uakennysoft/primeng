@@ -1,5 +1,5 @@
 {
-  "name": "primeng",
+  "name": "primeng-ua",
   "version": "4.1.0-SNAPSHOT",
   "license": "MIT",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/primefaces/primeng.git"
+    "url": "https://github.com/uakennysoft/primeng.git"
   },
   "devDependencies": {
     "@angular/animations": "^4.2.0",
