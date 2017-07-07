@@ -18,6 +18,7 @@ import {Component} from '@angular/core';
                 <li><a [routerLink]="['/datatable/rowexpansion']">&#9679; Expand</a></li>
                 <li><a [routerLink]="['/datatable/colresize']">&#9679; Resize</a></li>
                 <li><a [routerLink]="['/datatable/colreorder']">&#9679; Reorder</a></li>
+                <li><a [routerLink]="['/datatable/colorder']">&#9679; Column Order</a></li>
                 <li><a [routerLink]="['/datatable/scroll']">&#9679; Scroll</a></li>
                 <li><a [routerLink]="['/datatable/lazy']">&#9679; Lazy</a></li>
                 <li><a [routerLink]="['/datatable/contextmenu']">&#9679; ContextMenu</a></li>

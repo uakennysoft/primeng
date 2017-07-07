@@ -35,6 +35,7 @@ import {MultiSelectModule} from '../../../components/multiselect/multiselect';
 import {GrowlModule} from '../../../components/growl/growl';
 import {TabViewModule} from '../../../components/tabview/tabview';
 import {CodeHighlighterModule} from '../../../components/codehighlighter/codehighlighter';
+import {DataTableColumnOrderDemo} from './datatablecolumnorderdemo';
 
 @NgModule({
 	imports: [
@@ -74,6 +75,7 @@ import {CodeHighlighterModule} from '../../../components/codehighlighter/codehig
         DataTableScrollDemo,
         DataTableSelectionDemo,
         DataTableSortDemo,
+        DataTableColumnOrderDemo,
         DataTableTemplatingDemo,
         DataTableSubmenu
 	]

@@ -19,6 +19,7 @@ import {DataTableRowExpansionDemo} from './datatablerowexpansiondemo';
 import {DataTableScrollDemo} from './datatablescrolldemo';
 import {DataTableSelectionDemo} from './datatableselectiondemo';
 import {DataTableSortDemo} from './datatablesortdemo';
+import {DataTableColumnOrderDemo} from './datatablecolumnorderdemo';
 import {DataTableTemplatingDemo} from './datatabletemplatingdemo';
 
 @NgModule({
@@ -28,6 +29,7 @@ import {DataTableTemplatingDemo} from './datatabletemplatingdemo';
             {path: 'facets', component: DataTableFacetsDemo},
             {path: 'paginator', component: DataTablePaginatorDemo},
             {path: 'sort', component: DataTableSortDemo},
+            {path: 'colorder', component: DataTableColumnOrderDemo},
             {path: 'responsive', component: DataTableResponsiveDemo},
             {path: 'selection', component: DataTableSelectionDemo},
             {path: 'filter', component: DataTableFilterDemo},
