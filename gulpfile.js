@@ -47,4 +47,3 @@ gulp.task('clean', function() {
 //Building project with run sequence
 gulp.task('build-assets', ['clean','build-css-prod', 'images', 'themes']);
 
-        
