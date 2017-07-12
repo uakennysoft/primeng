@@ -109,7 +109,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
                 [ngClass]="{'ui-state-default ui-unselectable-text':true, 'ui-sortable-column': col.sortable, 'ui-state-active': dt.isSorted(col), 'ui-resizable-column': dt.resizableColumns, 'ui-selection-column':col.selectionMode}" 
                 (dragstart)="dt.onColumnDragStart($event)" (dragover)="dt.onColumnDragover($event)" (dragleave)="dt.onColumnDragleave($event)" (drop)="dt.onColumnDrop($event)" (mousedown)="dt.onHeaderMousedown($event,headerCell)"
                 [attr.tabindex]="col.sortable ? tabindex : null" (keydown)="dt.onHeaderKeydown($event,col)">
-                <span class="ui-column-resizer" *ngIf="dt.resizableColumns && ((dt.columnResizeMode == 'fit' && !lastCol) || dt.columnResizeMode == 'expand')" (mousedown)="dt.initColumnResize($event)"></span>
+                <span class="ui-column-resizer ui-clickable" *ngIf="dt.resizableColumns && ((dt.columnResizeMode == 'fit' && !lastCol) || dt.columnResizeMode == 'expand')" (mousedown)="dt.initColumnResize($event)"></span>
                 <span class="ui-column-title" *ngIf="!col.selectionMode&&!col.headerTemplate">{{col.header}}</span>
                 <span class="ui-column-title" *ngIf="col.headerTemplate">
                     <p-columnHeaderTemplateLoader [column]="col"></p-columnHeaderTemplateLoader>
@@ -168,7 +168,7 @@ export class ColumnFooters {
                 </td>
             </tr>
             <tr #rowElement *ngIf="!dt.expandableRowGroups||dt.isRowGroupExpanded(rowData)" [class]="dt.getRowStyleClass(rowData,rowIndex)"
-                    (click)="dt.handleRowClick($event, rowData)" (dblclick)="dt.rowDblclick($event,rowData)" (contextmenu)="dt.onRowRightClick($event,rowData)" (touchend)="dt.handleRowTouchEnd($event)"
+                    (click)="dt.handleRowClick($event, rowData, rowIndex)" (dblclick)="dt.rowDblclick($event,rowData)" (contextmenu)="dt.onRowRightClick($event,rowData)" (touchend)="dt.handleRowTouchEnd($event)"
                     [ngClass]="{'ui-datatable-even':even&&dt.rowGroupMode!='rowspan','ui-datatable-odd':odd&&dt.rowGroupMode!='rowspan','ui-state-highlight': dt.isSelected(rowData)}">
                 <ng-template ngFor let-col [ngForOf]="columns" let-colIndex="index">
                     <td #cell *ngIf="!dt.rowGroupMode || (dt.rowGroupMode == 'subheader') ||
@@ -712,7 +712,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
     public preventSelectionKeysPropagation: boolean;
 
     public preventSortPropagation: boolean;
-
+    public preventRowClickPropagation: boolean;
     differ: any;
 
     _selection: any;
@@ -724,7 +724,9 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
     columnsSubscription: Subscription;
 
     totalRecordsChanged: boolean;
+    anchorRowIndex: number;
 
+    rangeRowIndex: number;
     constructor(public el: ElementRef, public domHandler: DomHandler, public differs: IterableDiffers,
             public renderer: Renderer2, public changeDetector: ChangeDetectorRef, public objectUtils: ObjectUtils) {
     	this.differ = differs.find([]).create(null);
@@ -1241,9 +1243,67 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
             }
         }
     }
+    clearSelectionRange() {
+        let rangeStart, rangeEnd;
 
-    handleRowClick(event, rowData) {
-        let targetNode = event.target.nodeName;
+        if(this.rangeRowIndex > this.anchorRowIndex) {
+            rangeStart = this.anchorRowIndex;
+            rangeEnd = this.rangeRowIndex;
+        }
+        else if(this.rangeRowIndex < this.anchorRowIndex) {
+            rangeStart = this.rangeRowIndex;
+            rangeEnd = this.anchorRowIndex;
+        }
+        else {
+            rangeStart = this.rangeRowIndex;
+            rangeEnd = this.rangeRowIndex;
+        }
+
+        for(let i = rangeStart; i <= rangeEnd; i++) {
+            let rangeRowData = this.dataToRender[i];
+            let selectionIndex = this.findIndexInSelection(rangeRowData);
+            this._selection = this.selection.filter((val,i) => i!=selectionIndex);
+            let dataKeyValue: string = this.dataKey ? String(this.resolveFieldData(rangeRowData, this.dataKey)) : null;
+            if(dataKeyValue) {
+                delete this.selectionKeys[dataKeyValue];
+            }
+            this.onRowUnselect.emit({originalEvent: event, data: rangeRowData, type: 'row'});
+        }
+    }
+
+    selectRange(rowIndex: number) {
+        let rangeStart, rangeEnd;
+
+        if(this.anchorRowIndex > rowIndex) {
+            rangeStart = rowIndex;
+            rangeEnd = this.anchorRowIndex;
+        }
+        else if(this.anchorRowIndex < rowIndex) {
+            rangeStart = this.anchorRowIndex;
+            rangeEnd = rowIndex;
+        }
+        else {
+            rangeStart = rowIndex;
+            rangeEnd = rowIndex;
+        }
+
+        for(let i = rangeStart; i <= rangeEnd; i++) {
+            let rangeRowData = this.dataToRender[i];
+            this._selection = [...this.selection, rangeRowData];
+            this.selectionChange.emit(this.selection);
+            let dataKeyValue: string = this.dataKey ? String(this.resolveFieldData(rangeRowData, this.dataKey)) : null;
+            if(dataKeyValue) {
+                this.selectionKeys[dataKeyValue] = 1;
+            }
+            this.onRowSelect.emit({originalEvent: event, data: rangeRowData, type: 'row'});
+        }
+    }
+    handleRowClick(event: MouseEvent, rowData: any, index: number) {
+        if(this.preventRowClickPropagation) {
+            this.preventRowClickPropagation = false;
+            return;
+        }
+        let targetNode = (<HTMLElement>event.target).nodeName;
         if(this.editable) {
             let cell = this.findCell(event.target);
             let column = this.columns[this.domHandler.index(cell)];
@@ -1260,9 +1320,19 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
         this.onRowClick.next({originalEvent: event, data: rowData});
 
         if(this.selectionMode) {
-            let selected = this.isSelected(rowData);
+            if(this.isMultipleSelectionMode() && event.shiftKey && this.anchorRowIndex != null) {
+                this.domHandler.clearSelection();
+                if(this.rangeRowIndex != null) {
+                    this.clearSelectionRange();
+                }
+
+                this.rangeRowIndex = index;
+                this.selectRange(index);
+            }
+            else {let selected = this.isSelected(rowData);
             let metaSelection = this.rowTouched ? false : this.metaKeySelection;
-            let dataKeyValue: string = this.dataKey ? String(this.resolveFieldData(rowData, this.dataKey)) : null;
+            let dataKeyValue: string = this.dataKey ? String(this.resolveFieldData(rowData, this.dataKey)) : null;this.anchorRowIndex = index;
+                this.rangeRowIndex = index;
 
             if(metaSelection) {
                 let metaKey = event.metaKey||event.ctrlKey;
@@ -1302,12 +1372,12 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
                             this.selectionKeys = {};
                         }
 
-                        this._selection = [...this.selection,rowData];
-                        this.selectionChange.emit(this.selection);
-                        if(dataKeyValue) {
-                            this.selectionKeys[dataKeyValue] = 1;
+                            this._selection = [...this.selection,rowData];
+                            this.selectionChange.emit(this.selection);
+                            if(dataKeyValue) {
+                                this.selectionKeys[dataKeyValue] = 1;
+                            }
                         }
-                    }
 
                     this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'row'});
                 }
@@ -1346,7 +1416,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
                     }
                 }
 
-                this.selectionChange.emit(this.selection);
+                this.selectionChange.emit(this.selection);}
             }
 
             this.preventSelectionKeysPropagation = true;
@@ -1372,6 +1442,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
         }
 
         this.preventSelectionKeysPropagation = true;
+        this.preventRowClickPropagation = true;
     }
 
     toggleRowWithCheckbox(event, rowData: any) {
@@ -1396,6 +1467,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
 
         this.selectionChange.emit(this.selection);
         this.preventSelectionKeysPropagation = true;
+        this.preventRowClickPropagation = true;
     }
 
     toggleRowsWithCheckbox(event) {
