@@ -2056,6 +2056,15 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
       }
     }
 
+  fillWidthsProportionally(delta) {
+    const columns = Array.prototype.slice.call(this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column'));
+    const tableWidth = this.tbody.parentElement.width || this.tbody.parentElement.offsetWidth;
+    this.tbody.parentElement.style.width = `${tableWidth + delta}px`;
+    columns.map(column => column.offsetWidth * 100 / tableWidth)
+      .map(pct => (tableWidth + delta) * pct / 100)
+      .forEach((width, idx) => columns[idx].style.width = `${width}px`);
+  }
+
     onColumnDragStart(event) {
         if (this.columnResizing) {
             event.preventDefault();

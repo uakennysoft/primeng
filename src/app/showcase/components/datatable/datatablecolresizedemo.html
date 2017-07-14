@@ -26,7 +26,8 @@
         <p-column field="color" header="Color"></p-column>
     </p-dataTable>
   <h3>Expand Mode Persistent State</h3>
-  <p-dataTable [value]="cars" resizableColumns="true" columnResizeMode="expand" [columnsState]="columnsState">
+  Increase colSize <input type="number" value="{{delta}}" (change)="applyDelta($event.target.value)">
+  <p-dataTable #table_3 [value]="cars" resizableColumns="true" columnResizeMode="expand" [columnsState]="columnsState">
     <p-column colId="vin" field="vin" header="Vin"></p-column>
     <p-column colId = "year" field="year" header="Year"></p-column>
     <p-column colId = "brand" field="brand" header="Brand"></p-column>
