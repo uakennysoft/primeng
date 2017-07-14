@@ -3,7 +3,7 @@
 <div class="content-section introduction">
     <div>
         <span class="feature-title">DataTable</span>
-        <span>Columns can be resized using drag drop by setting the resizableColumns to true. There are two resize modes; "fit" and "expand". Fit is the default one and 
+        <span>Columns can be resized using drag drop by setting the resizableColumns to true. There are two resize modes; "fit" and "expand". Fit is the default one and
         the overall table width does not change when a column is resized. In "expand" mode, table width also changes along with the column width. onColumnResize
         is a callback that passes the resized column header as a parameter.</span>
     </div>
@@ -25,6 +25,14 @@
         <p-column field="brand" header="Brand"></p-column>
         <p-column field="color" header="Color"></p-column>
     </p-dataTable>
+  <h3>Expand Mode Persistent State</h3>
+  <p-dataTable [value]="cars" resizableColumns="true" columnResizeMode="expand" [columnsState]="columnsState">
+    <p-column colId="vin" field="vin" header="Vin"></p-column>
+    <p-column colId = "year" field="year" header="Year"></p-column>
+    <p-column colId = "brand" field="brand" header="Brand"></p-column>
+    <p-column colId = "color" field="color" header="Color"></p-column>
+  </p-dataTable>
+
 </div>
 
 <div class="content-section documentation">
@@ -47,7 +55,7 @@ export class DataTableColResizeDemo implements OnInit &#123;
     &#125;
 &#125;
 </code>
-</pre>            
+</pre>
         </p-tabPanel>
 
         <p-tabPanel header="datatablecolresizedemo.html">

@@ -318,6 +318,11 @@ export class TemplateLoader implements OnInit, OnDestroy {
 	}
 }
 
+export interface ColumnState {
+  colId: string;
+  width: number;
+}
+
 @NgModule({
     imports: [CommonModule],
     exports: [Header,Footer,Column,TemplateWrapper,ColumnHeaderTemplateLoader,ColumnBodyTemplateLoader,ColumnFooterTemplateLoader,ColumnFilterTemplateLoader,PrimeTemplate,TemplateLoader,Row,HeaderColumnGroup,FooterColumnGroup,ColumnEditorTemplateLoader],

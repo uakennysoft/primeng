@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms'
-import {SharedModule} from '../common/shared';
+import {ColumnState, SharedModule} from '../common/shared';
 import {PaginatorModule} from '../paginator/paginator';
 import {Column,Header,Footer,HeaderColumnGroup,FooterColumnGroup,PrimeTemplate} from '../common/shared';
 import {LazyLoadEvent} from '../common/lazyloadevent';
@@ -514,6 +514,8 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
     @Output() onContextMenuSelect: EventEmitter<any> = new EventEmitter();
 
     @Input() filterDelay: number = 300;
+
+    @Input() columnsState: ColumnState[];
 
     @Input() lazy: boolean;
 
@@ -2013,23 +2015,45 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
     }
 
     fixColumnWidths() {
-        let columns = this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column');
-        let bodyCols;
+      let columns = this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column');
+      let bodyCols;
+      if (this.columnsState) {
+        let totalWidth = 0;
+        columns.forEach(column => {
+          let found = this.columnsState.find(colState => colState.colId === column.id);
+          if (found) {
+            totalWidth += found.width;
+          } else {
+            totalWidth += column.style.width + column.offsetWidth;
+          }
+        });
+        this.tbody.parentElement.style.width = `${totalWidth}px`;
 
-        for(let i = 0; i < columns.length; i++) {
-            columns[i].style.width = columns[i].offsetWidth + 'px';
+
+        columns.forEach(column => {
+          let found = this.columnsState.find(colState => colState.colId === column.id);
+          if (found) {
+            column.style.width = `${found.width}px`;
+          } else {
+            column.style.width = `${column.offsetWidth}px`;
+          }
+        });
+      } else {
+        for (let i = 0; i < columns.length; i++) {
+          columns[i].style.width = columns[i].offsetWidth + 'px';
         }
+      }
 
-        if(this.scrollable) {
-            let colGroup = this.domHandler.findSingle(this.el.nativeElement, 'colgroup.ui-datatable-scrollable-colgroup');
-            bodyCols = colGroup.children;
+      if (this.scrollable) {
+        let colGroup = this.domHandler.findSingle(this.el.nativeElement, 'colgroup.ui-datatable-scrollable-colgroup');
+        bodyCols = colGroup.children;
 
-            if(bodyCols) {
-                for(let i = 0; i < columns.length; i++) {
-                    bodyCols[i].style.width = columns[i].offsetWidth + 'px';
-                }
-            }
+        if (bodyCols) {
+          for (let i = 0; i < columns.length; i++) {
+            bodyCols[i].style.width = columns[i].offsetWidth + 'px';
+          }
         }
+      }
     }
 
     onColumnDragStart(event) {
