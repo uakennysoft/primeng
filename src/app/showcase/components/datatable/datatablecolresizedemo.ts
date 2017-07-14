@@ -13,7 +13,6 @@ export class DataTableColResizeDemo implements OnInit {
     {colId: 'vin', width: 50},
     {colId: 'year', width: 300},
     {colId: 'brand', width: 100},
-    {colId: 'color', width: 200}
   ];
 
   constructor(private carService:CarService) {

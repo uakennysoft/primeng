@@ -2024,7 +2024,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
           if (found) {
             totalWidth += found.width;
           } else {
-            totalWidth += column.style.width + column.offsetWidth;
+            totalWidth += column.offsetWidth;
           }
         });
         this.tbody.parentElement.style.width = `${totalWidth}px`;
