@@ -2056,13 +2056,22 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
       }
     }
 
-  fillWidthsProportionally(delta) {
+  fillWidthsProportionally(delta, defaults:ColumnState[]) {
     const columns = Array.prototype.slice.call(this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column'));
     const tableWidth = this.tbody.parentElement.width || this.tbody.parentElement.offsetWidth;
-    this.tbody.parentElement.style.width = `${tableWidth + delta}px`;
+    const newColumnsWidth = [];
     columns.map(column => column.offsetWidth * 100 / tableWidth)
       .map(pct => (tableWidth + delta) * pct / 100)
-      .forEach((width, idx) => columns[idx].style.width = `${width}px`);
+      .forEach((width, idx) => {
+        const defIndex = defaults.findIndex(defCol => defCol.colId === columns[idx].id);
+        newColumnsWidth[idx] = defIndex === -1 ? width : Math.max(width, defaults[defIndex].width);
+      });
+    let totalWidth = newColumnsWidth.reduce((width, total) => {
+      total += width;
+      return total;
+    }, 0);
+    this.tbody.parentElement.style.width = `${totalWidth}px`;
+    newColumnsWidth.forEach((width, idx) => columns[idx].style.width = `${width}px`);
   }
 
     onColumnDragStart(event) {

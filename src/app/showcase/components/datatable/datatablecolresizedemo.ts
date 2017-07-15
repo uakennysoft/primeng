@@ -17,13 +17,14 @@ export class DataTableColResizeDemo implements OnInit {
     {colId: 'vin', width: 100},
     {colId: 'year', width: 300},
     {colId: 'brand', width: 200},
+    {colId: 'color', width: 200},
   ];
 
   constructor(private carService:CarService) {
   }
 
   applyDelta(delta) {
-    this.dataTable.fillWidthsProportionally(parseInt(delta));
+    this.dataTable.fillWidthsProportionally(parseInt(delta), this.columnsState);
   }
 
   ngOnInit() {
