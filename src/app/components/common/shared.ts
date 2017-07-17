@@ -321,6 +321,7 @@ export class TemplateLoader implements OnInit, OnDestroy {
 export interface ColumnState {
   colId: string;
   width: number;
+  frozen?: boolean;
 }
 
 @NgModule({

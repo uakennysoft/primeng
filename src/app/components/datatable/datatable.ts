@@ -2056,22 +2056,34 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
       }
     }
 
-  fillWidthsProportionally(delta, defaults:ColumnState[]) {
+  fillWidthsProportionally(delta, columnsState:ColumnState[]) {
     const columns = Array.prototype.slice.call(this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column'));
     const tableWidth = this.tbody.parentElement.width || this.tbody.parentElement.offsetWidth;
-    const newColumnsWidth = [];
-    columns.map(column => column.offsetWidth * 100 / tableWidth)
-      .map(pct => (tableWidth + delta) * pct / 100)
-      .forEach((width, idx) => {
-        const defIndex = defaults.findIndex(defCol => defCol.colId === columns[idx].id);
-        newColumnsWidth[idx] = defIndex === -1 ? width : Math.max(width, defaults[defIndex].width);
-      });
-    let totalWidth = newColumnsWidth.reduce((width, total) => {
-      total += width;
-      return total;
-    }, 0);
+    let frozenColsTotalWidth = columns
+      .filter(column => {
+        let found = columnsState.find(colState => colState.colId === column.id);
+        return found && found.frozen;
+      })
+      .reduce((total, column) => total + column.offsetWidth, 0);
+    let newColWidths = columns
+      .reduce((updatedColsInfo, column) => {
+        let found = columnsState.find(colState => colState.colId === column.id);
+        let colEntry;
+        if (!found || !found.frozen) {
+          const colPct = column.offsetWidth * 100 / (tableWidth - frozenColsTotalWidth);
+          const newColWidth = found ? Math.max((tableWidth - frozenColsTotalWidth + delta) * colPct / 100, found.width) :
+            (tableWidth - frozenColsTotalWidth + delta) * colPct / 100;
+          colEntry = {column, width: newColWidth};
+        } else {
+          colEntry = {column, width: column.offsetWidth};
+        }
+        return [...updatedColsInfo, colEntry];
+
+      }, []);
+    console.log('new cols widths: %O', newColWidths);
+    let totalWidth = newColWidths.reduce((total, colsInfo) => total + colsInfo.width, 0);
     this.tbody.parentElement.style.width = `${totalWidth}px`;
-    newColumnsWidth.forEach((width, idx) => columns[idx].style.width = `${width}px`);
+    newColWidths.forEach(columnInfo => columnInfo.column.style.width = `${columnInfo.width}px`);
   }
 
     onColumnDragStart(event) {

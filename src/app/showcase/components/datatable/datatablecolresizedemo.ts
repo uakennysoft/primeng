@@ -15,9 +15,9 @@ export class DataTableColResizeDemo implements OnInit {
 
   columnsState:ColumnState[] = [
     {colId: 'vin', width: 100},
-    {colId: 'year', width: 300},
+    {colId: 'year', width: 300, frozen: true},
     {colId: 'brand', width: 200},
-    {colId: 'color', width: 200},
+    {colId: 'color', width: 200, frozen: true},
   ];
 
   constructor(private carService:CarService) {
