@@ -1,6 +1,6 @@
 {
   "name": "primeng-ua",
-  "version": "4.1.9-3",
+  "version": "4.1.9",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
