@@ -2080,7 +2080,6 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
         return [...updatedColsInfo, colEntry];
 
       }, []);
-    console.log('new cols widths: %O', newColWidths);
     let totalWidth = newColWidths.reduce((total, colsInfo) => total + colsInfo.width, 0);
     this.tbody.parentElement.style.width = `${totalWidth}px`;
     newColWidths.forEach(columnInfo => columnInfo.column.style.width = `${columnInfo.width}px`);
