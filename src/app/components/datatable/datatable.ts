@@ -911,7 +911,6 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
 
     initColumns(): void {
         this.columns = this.cols.toArray().sort((col1, col2) => col1.order-col2.order);
-
         if(this.scrollable) {
             this.scrollableColumns = [];
             this.cols.forEach((col) => {
@@ -2166,6 +2165,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
                     dropIndex: dropIndex,
                     columns: this.columns
                 });
+                this.initColumns();
             }
 
             this.reorderIndicatorUp.style.display = 'none';
