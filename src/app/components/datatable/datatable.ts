@@ -2165,7 +2165,6 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
                     dropIndex: dropIndex,
                     columns: this.columns
                 });
-                this.initColumns();
             }
 
             this.reorderIndicatorUp.style.display = 'none';
