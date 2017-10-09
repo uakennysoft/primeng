@@ -10,6 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "build:release": "node_modules\\.bin\\tsc -p tsconfig-release.json",
+    "build:aot": "node_modules\\.bin\\ngc -p tsconfig-aot.json",
     "prepublish": "npm run build:release && gulp build-assets && node_modules\\.bin\\node-sass.cmd resources --output resources --source-map true --source-map-contents resources"
   },
   "repository": {
