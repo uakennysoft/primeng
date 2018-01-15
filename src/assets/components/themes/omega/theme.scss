@@ -52,6 +52,7 @@ $stateHoverTextColor: #212121;
 $inputBgColor: #ffffff;
 $inputTextColor: #222222;
 $invalidInputBorderColor: #f44336;
+$inputGroupTextColor: #222222;
 
 @import '../_theme';
 
@@ -166,14 +167,29 @@ $invalidInputBorderColor: #f44336;
 .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
 .ui-slider-vertical .ui-slider-range-max { top: 0; }
 
-.ui-progressbar .ui-progressbar-value {
-	 border: 1px solid #3f94e9; 
-     background: #8ec5fc;
+.ui-progressbar {
+    &.ui-progressbar-determinate {
+        .ui-progressbar-value {
+        	 border: 0 none;
+             background: #8ec5fc;
+        }
+        
+        .ui-progressbar .ui-progressbar-label {
+        	color: #222222;
+        }
+    }
+    
+    &.ui-progressbar-indeterminate {
+        background: #8ec5fc;
+        
+        .ui-progressbar-value {
+        	 border: 0 none;
+             background-color: $stateHighlightBgColor;
+        }
+    }
 }
 
-.ui-progressbar .ui-progressbar-label {
-	color: #222222;
-}
+
 
 .ui-widget-header .ui-button,		
 .ui-widget-content .ui-button,
@@ -187,8 +203,6 @@ $invalidInputBorderColor: #f44336;
     transition: background-color .2s;
     
     &:enabled:hover,
-    &.ui-state-focus,
-    &:not(.ui-state-disabled):hover,
     &:focus {
         border: 1px solid #1f89ce;
     	background: #1f89ce;
@@ -196,12 +210,25 @@ $invalidInputBorderColor: #f44336;
         color: #ffffff;
     }
     
-    &:enabled:active,
-    &:not(.ui-state-disabled):active {
+    &:enabled:active {
         border: 1px solid #156090;
     	background: #186ba0;
         color: #ffffff;
     }
+}
+
+.ui-fileupload-choose:not(.ui-state-disabled):hover,
+.ui-fileupload-choose.ui-state-focus {
+    border: 1px solid #1f89ce;
+    background: #1f89ce;
+    outline: 0 none;
+    color: #ffffff;
+}
+
+.ui-fileupload-choose:not(.ui-state-disabled):active {
+    border: 1px solid #156090;
+    background: #186ba0;
+    color: #ffffff;
 }
 
 /* Checkbox and Radio */
@@ -291,6 +318,34 @@ $invalidInputBorderColor: #f44336;
                 background: #ebedf0;
                 border-color: #d9d9d9;
             }
+        }
+    }
+}
+
+/* TurboTable */
+.ui-table {
+    .ui-table-thead > tr > th,
+    .ui-table-tfoot > tr > td {
+        background: #ebedf0;
+        border-color: #d9d9d9;
+    }
+
+    .ui-sortable-column:not(.ui-state-highlight):hover {
+        background: #d3d5d8;
+        border-color: #d9d9d9;
+    }
+
+    .ui-table-tbody > tr:nth-child(even) {
+        background-color: #fafafb;
+
+        &.ui-state-highlight {
+            background-color: $stateHighlightBgColor;
+            color: $stateHighlightTextColor;
+        }
+
+        &.ui-contextmenu-selected {
+            background-color: lighten($stateHighlightBgColor, 20%);
+            color: $stateHighlightTextColor;
         }
     }
 }
@@ -543,4 +598,15 @@ $invalidInputBorderColor: #f44336;
 
 .ui-dialog.ui-widget .ui-dialog-content {
     padding: 1em 1.5em;
+}
+
+/* Schedule */
+.fc {
+    .fc-button-group {
+        .ui-state-active {
+            border: 1px solid #156090;
+            background: #186ba0;
+            color: #ffffff;
+        }
+    }
 }
